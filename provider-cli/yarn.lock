@@ -431,7 +431,7 @@
     multiformats "^9.5.4"
     varint "^6.0.0"
 
-"@ipld/dag-cbor@^6.0.3":
+"@ipld/dag-cbor@^6.0.13", "@ipld/dag-cbor@^6.0.3":
   version "6.0.15"
   resolved "https://registry.yarnpkg.com/@ipld/dag-cbor/-/dag-cbor-6.0.15.tgz#aebe7a26c391cae98c32faedb681b1519e3d2372"
   integrity sha512-Vm3VTSTwlmGV92a3C5aeY+r2A18zbH2amehNhsX8PBa3muXICaWrN8Uri85A5hLH7D7ElhE8PdjxD6kNqUmTZA==
@@ -703,14 +703,14 @@
     data-uri-to-buffer "^3.0.1"
     mrmime "^1.0.0"
 
-"@web-std/file@^3.0.2":
+"@web-std/file@^3.0.0", "@web-std/file@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@web-std/file/-/file-3.0.2.tgz#b84cc9ed754608b18dcf78ac62c40dbcc6a94692"
   integrity sha512-pIH0uuZsmY8YFvSHP1NsBIiMT/1ce0suPrX74fEeO3Wbr1+rW0fUGEe4d0R99iLwXtyCwyserqCFI4BJkJlkRA==
   dependencies:
     "@web-std/blob" "^3.0.3"
 
-"@web-std/form-data@^3.0.2":
+"@web-std/form-data@^3.0.0", "@web-std/form-data@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@web-std/form-data/-/form-data-3.0.2.tgz#c71d9def6a593138ea92fe3d1ffbce19f43e869c"
   integrity sha512-rhc8IRw66sJ0FHcnC84kT3mTN6eACTuNftkt1XSl1Ef6WRKq4Pz65xixxqZymAZl1K3USpwhLci4SKNn4PYxWQ==
@@ -2546,6 +2546,33 @@ ipaddr.js@1.9.1:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.1.tgz#bff38543eeb8984825079ff3a2a8e6cbd46781b3"
   integrity sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==
 
+ipfs-car@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/ipfs-car/-/ipfs-car-0.6.2.tgz#ec645cebe29056344abb3545e4e2e99788a4405c"
+  integrity sha512-tliuakkKKtCa4TTnFT3zJKjq/aD8EGKX8Y0ybCyrAW0fo/n2koZpxiLjBvtTs47Rqyji6ggXo+atPbJJ60hJmg==
+  dependencies:
+    "@ipld/car" "^3.2.3"
+    "@web-std/blob" "^3.0.1"
+    bl "^5.0.0"
+    blockstore-core "^1.0.2"
+    browser-readablestream-to-it "^1.0.2"
+    idb-keyval "^6.0.3"
+    interface-blockstore "^2.0.2"
+    ipfs-core-types "^0.8.3"
+    ipfs-core-utils "^0.12.1"
+    ipfs-unixfs-exporter "^7.0.4"
+    ipfs-unixfs-importer "^9.0.4"
+    ipfs-utils "^9.0.2"
+    it-all "^1.0.5"
+    it-last "^1.0.5"
+    it-pipe "^1.1.0"
+    meow "^9.0.0"
+    move-file "^2.1.0"
+    multiformats "^9.6.3"
+    stream-to-it "^0.2.3"
+    streaming-iterables "^6.0.0"
+    uint8arrays "^3.0.0"
+
 ipfs-car@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/ipfs-car/-/ipfs-car-0.7.0.tgz#72955d2b6904e87edfa17bbe5c00c1b3fcb79bb9"
@@ -3391,7 +3418,7 @@ multiaddr@^10.0.0:
     uint8arrays "^3.0.0"
     varint "^6.0.0"
 
-multiformats@^9.0.4, multiformats@^9.4.13, multiformats@^9.4.2, multiformats@^9.4.5, multiformats@^9.4.7, multiformats@^9.5.4, multiformats@^9.6.3:
+multiformats@^9.0.4, multiformats@^9.4.13, multiformats@^9.4.2, multiformats@^9.4.5, multiformats@^9.4.7, multiformats@^9.5.4, multiformats@^9.6.3, multiformats@^9.6.4:
   version "9.8.1"
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.8.1.tgz#0e5f2910cf0c34f55adf0602f920775f9622552a"
   integrity sha512-Cu7NfUYtCV+WN7w59WsRRF138S+um4tTo11ScYsWbNgWyCEGOu8wID1e5eMJs91gFZ0I7afodkkdxCF8NGkqZQ==
@@ -3439,6 +3466,25 @@ negotiator@0.6.3:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"
   integrity sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==
 
+nft.storage@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/nft.storage/-/nft.storage-7.0.0.tgz#9855106a16649673db12684232bb0292694230fe"
+  integrity sha512-6ris9loxF9TNTPY/JghLzdLlvFV3UzWkUcVTfmrRn49jzDUfyT5wMhDmYRBQuknNFN1jf7jlSGNHixs5SpOoOA==
+  dependencies:
+    "@ipld/car" "^3.2.3"
+    "@ipld/dag-cbor" "^6.0.13"
+    "@web-std/blob" "^3.0.1"
+    "@web-std/fetch" "^3.0.3"
+    "@web-std/file" "^3.0.0"
+    "@web-std/form-data" "^3.0.0"
+    carbites "^1.0.6"
+    ipfs-car "^0.6.2"
+    it-pipe "^1.1.0"
+    multiformats "^9.6.4"
+    p-retry "^4.6.1"
+    streaming-iterables "^6.0.0"
+    throttled-queue "^2.1.2"
+
 node-abi@^2.21.0:
   version "2.30.1"
   resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.30.1.tgz#c437d4b1fe0e285aaf290d45b45d4d7afedac4cf"
@@ -3446,14 +3492,7 @@ node-abi@^2.21.0:
   dependencies:
     semver "^5.4.1"
 
-node-fetch@^2.6.1, node-fetch@^2.6.6:
-  version "2.6.7"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
-  integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
-  dependencies:
-    whatwg-url "^5.0.0"
-
-"node-fetch@https://registry.npmjs.org/@achingbrain/node-fetch/-/node-fetch-2.6.7.tgz":
+node-fetch@^2.6.1, node-fetch@^2.6.6, "node-fetch@https://registry.npmjs.org/@achingbrain/node-fetch/-/node-fetch-2.6.7.tgz":
   version "2.6.7"
   resolved "https://registry.npmjs.org/@achingbrain/node-fetch/-/node-fetch-2.6.7.tgz#1b5d62978f2ed07b99444f64f0df39f960a6d34d"
 
@@ -3684,7 +3723,7 @@ p-locate@^4.1.0:
   dependencies:
     p-limit "^2.2.0"
 
-p-retry@^4.5.0:
+p-retry@^4.5.0, p-retry@^4.6.1:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/p-retry/-/p-retry-4.6.2.tgz#9baae7184057edd4e17231cee04264106e092a16"
   integrity sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==
@@ -4637,11 +4676,6 @@ touch@^3.1.0:
   dependencies:
     nopt "~1.0.10"
 
-tr46@~0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
-  integrity sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=
-
 trim-newlines@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/trim-newlines/-/trim-newlines-3.0.1.tgz#260a5d962d8b752425b32f3a7db0dcacd176c144"
@@ -4899,7 +4933,7 @@ web-streams-polyfill@^3.1.1:
   resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"
   integrity sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==
 
-web3.storage@^4.4.0:
+web3.storage@^4.3.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/web3.storage/-/web3.storage-4.4.0.tgz#c62807e6400b16eb028d93bed6d7f76a929150a8"
   integrity sha512-I48GB+cFGfSbi47e3ZmyRX/ZUi9EcrqUylZ6FG1AU8UGErG3t4svZocaXTaUnp2zZWAtbbUFsFtD/cd9FgoVjA==
@@ -4920,19 +4954,6 @@ web3.storage@^4.4.0:
     throttled-queue "^2.1.2"
     uint8arrays "^3.0.0"
     w3name "^1.0.4"
-
-webidl-conversions@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"
-  integrity sha1-JFNCdeKnvGvnvIZhHMFq4KVlSHE=
-
-whatwg-url@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/whatwg-url/-/whatwg-url-5.0.0.tgz#966454e8765462e37644d3626f6742ce8b70965d"
-  integrity sha1-lmRU6HZUYuN2RNNib2dCzotwll0=
-  dependencies:
-    tr46 "~0.0.3"
-    webidl-conversions "^3.0.0"
 
 which-boxed-primitive@^1.0.2:
   version "1.0.2"

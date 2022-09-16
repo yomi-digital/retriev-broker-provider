@@ -4,6 +4,7 @@ const argv = require('minimist')(process.argv.slice(2));
 let proposalCache = []
 let isProcessing = false
 const { pinFileToWeb3Storage } = require('../brokers/web3storage.js')
+const { pinFileToNFTStorage } = require('../brokers/nftstorage.js')
 
 const ipfs = (method, endpoint, arguments) => {
     return new Promise(async response => {
@@ -475,6 +476,99 @@ const processdeal = (node, deal_index) => {
                                     canAccept = false
                                 }
                             }
+
+                            // Check if pinning mode is active
+                            if (configs.pinning_mode !== undefined && configs.pinning_mode === 'REMOTE') {
+                                try {
+                                    console.log("Pinning with remote service..")
+                                    const pinned = await ipfs("post", "/pin/remote/add?arg=" + proposal.deal_uri.replace("ipfs://", "/ipfs/") + '&service=' + configs.pinning_service + '&recursive=true')
+                                    console.log('Pinning status is:', pinned)
+                                } catch (e) {
+                                    console.log("Remote pinning failed")
+                                    canAccept = false
+                                }
+                            } else if (configs.pinning_mode !== undefined && configs.pinning_mode === 'API' && configs.pinning_service === 'web3.storage') {
+                                try {
+                                    console.log("Downloading actual content from local IPFS node..")
+                                    const content = await axios.get('http://localhost:8080/ipfs/' + proposal.deal_uri.replace("ipfs://", ''), { responseType: "arraybuffer" })
+                                    console.log("File type is:", content.headers['content-type'])
+                                    const extension = content.headers['content-type'].split("/")[1]
+                                    console.log("Pinning file to Web3.storage via API..")
+                                    const pinned = await pinFileToWeb3Storage(configs.pinning_api_token, content.data, "retriev_deal_" + deal_index.toString() + '.' + extension, true)
+                                    if (!pinned) {
+                                        console.log("Can't pin on Web3.storage via API")
+                                        canAccept = false
+                                        if (proposalCache.indexOf(deal_index) === -1) {
+                                            console.log('Adding deal in cache for future retrieval')
+                                            proposalCache.push(deal_index)
+                                        }
+                                    } else {
+                                        if (pinned === proposal.deal_uri.replace("ipfs://", '')) {
+                                            console.log("Successfully pinned on Web3.storage via API")
+                                        } else {
+                                            console.log("--")
+                                            console.log("CID doesn't matches, something is wrong...")
+                                            console.log("Deal URI:", proposal.deal_uri.replace("ipfs://", ''))
+                                            console.log("Pinned:", pinned)
+                                            console.log('--')
+                                            canAccept = false
+                                            if (proposalCache.indexOf(deal_index) === -1) {
+                                                console.log('Adding deal in cache for future retrieval')
+                                                proposalCache.push(deal_index)
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log(e)
+                                    console.log("Error while uploading via API on Web3.storage")
+                                    canAccept = false
+                                    if (proposalCache.indexOf(deal_index) === -1) {
+                                        console.log('Adding deal in cache for future retrieval')
+                                        proposalCache.push(deal_index)
+                                    }
+                                }
+                            } else if (configs.pinning_mode !== undefined && configs.pinning_mode === 'API' && configs.pinning_service === 'nft.storage') {
+                                try {
+                                    console.log("Downloading actual content from local IPFS node..")
+                                    const content = await axios.get('http://localhost:8080/ipfs/' + proposal.deal_uri.replace("ipfs://", ''), { responseType: "arraybuffer" })
+                                    console.log("File type is:", content.headers['content-type'])
+                                    const extension = content.headers['content-type'].split("/")[1]
+                                    console.log("Pinning file to NFT.storage via API..")
+                                    const pinned = await pinFileToNFTStorage(configs.pinning_api_token, content.data, "retriev_deal_" + deal_index.toString() + '.' + extension, true)
+                                    if (!pinned) {
+                                        console.log("Can't pin on NFT.storage via API")
+                                        canAccept = false
+                                        if (proposalCache.indexOf(deal_index) === -1) {
+                                            console.log('Adding deal in cache for next round')
+                                            proposalCache.push(deal_index)
+                                        }
+                                    } else {
+                                        if (pinned === proposal.deal_uri.replace("ipfs://", '')) {
+                                            console.log("Successfully pinned on NFT.storage via API")
+                                        } else {
+                                            console.log("--")
+                                            console.log("CID doesn't matches, something is wrong...")
+                                            console.log("Deal URI:", proposal.deal_uri.replace("ipfs://", ''))
+                                            console.log("Pinned:", pinned)
+                                            console.log('--')
+                                            canAccept = false
+                                            if (proposalCache.indexOf(deal_index) === -1) {
+                                                console.log('Adding deal in cache for next round')
+                                                proposalCache.push(deal_index)
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log(e)
+                                    console.log("Error while uploading via API on NFT.storage")
+                                    canAccept = false
+                                    if (proposalCache.indexOf(deal_index) === -1) {
+                                        console.log('Adding deal in cache for next round')
+                                        proposalCache.push(deal_index)
+                                    }
+                                }
+                            }
+
                             // Be sure provider can accept deal
                             if (canAccept) {
                                 console.log("Can accept, listed as provider in deal.")
@@ -491,15 +585,6 @@ const processdeal = (node, deal_index) => {
                                     deal_uri: proposal.deal_uri,
                                     txid: tx.hash
                                 })
-                                // Check if pinning mode is active
-                                if (configs.pinning_mode !== undefined && configs.pinning_mode === 'REMOTE') {
-                                    console.log("Pinning with remote service..")
-                                    const pinned = await ipfs("post", "/pin/remote/add?arg=" + proposal.deal_uri.replace("ipfs://", "/ipfs/") + '&service=' + configs.pinning_service + '&recursive=true')
-                                    console.log('Pinning status is:', pinned)
-                                } else if (configs.pinning_mode !== undefined && configs.pinning_mode === 'API' && configs.pinning_service === 'web3.storage') {
-                                    // TODO: Download actual content
-                                    const pinned = await pinFileToWeb3Storage(configs.pinning_api_token, )
-                                }
                                 await node.broadcast(message, "message")
                                 // Be sure deal is not in cache anymore
                                 let temp = []

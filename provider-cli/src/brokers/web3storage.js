@@ -1,16 +1,13 @@
 const { Web3Storage, File } = require('web3.storage')
 
-const pinFileToWeb3Storage = (jwt, content, version, debug = false) => {
+const pinFileToWeb3Storage = (jwt, buffer, filename, debug = false) => {
     return new Promise(async response => {
         try {
-            const buffer = Buffer.from(content)
-            let files = [
-                new File([buffer], version)
-            ]
+            let files = [new File([buffer], filename)]
             const client = new Web3Storage({ token: jwt })
             const uploaded = await client.put(files, { wrapWithDirectory: false })
             if (debug) {
-                console.log(uploaded)
+                console.log("Uploaded file is:", uploaded)
             }
             response(uploaded)
         } catch (e) {
