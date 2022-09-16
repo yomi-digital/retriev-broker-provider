@@ -503,20 +503,7 @@ const processdeal = (node, deal_index) => {
                                             proposalCache.push(deal_index)
                                         }
                                     } else {
-                                        if (pinned === proposal.deal_uri.replace("ipfs://", '')) {
-                                            console.log("Successfully pinned on Web3.storage via API")
-                                        } else {
-                                            console.log("--")
-                                            console.log("CID doesn't matches, something is wrong...")
-                                            console.log("Deal URI:", proposal.deal_uri.replace("ipfs://", ''))
-                                            console.log("Pinned:", pinned)
-                                            console.log('--')
-                                            canAccept = false
-                                            if (proposalCache.indexOf(deal_index) === -1) {
-                                                console.log('Adding deal in cache for future retrieval')
-                                                proposalCache.push(deal_index)
-                                            }
-                                        }
+                                        // TODO: Save in a database the pointer then it's needed for retrieval
                                     }
                                 } catch (e) {
                                     console.log(e)

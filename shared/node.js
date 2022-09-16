@@ -313,16 +313,11 @@ module.exports = class RetrievNode {
                 res.status(404).send("FILE_NOT_FOUND")
             }, 30000)
             try {
+                // TODO: Retrieve file from web3.storage / nft.storage and get back to the user.
                 const hash = req.params.hash
-                console.log("Downloading file from IPFS: " + hash)
-                const file = await axios.post("http://127.0.0.1:5001/api/v0/files/stat?arg=/ipfs/" + hash)
-                if (file.data.Hash === hash) {
-                    clearTimeout(timeout)
-                    req.pipe(request("http://127.0.0.1:8080/ipfs/" + hash)).pipe(res);
-                } else {
-                    clearTimeout(timeout)
-                    res.status(404).send({ message: "Can't fetch file from IPFS" })
-                }
+                console.log("Searching for correct file routing for file: " + hash)
+                // TODO: Read if is web3.storage and find correct hash otherwise points to nft.storage
+                req.pipe(request("https://nftstorage.link/ipfs/" + hash)).pipe(res);
             } catch (e) {
                 console.log(e.message)
                 clearTimeout(timeout)
