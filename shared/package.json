@@ -1,0 +1,23 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "shared.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "buffer-type": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "ethers": "^5.6.2",
+    "express": "^4.17.3",
+    "external-ip": "^2.3.1",
+    "minimist": "^1.2.6",
+    "request": "^2.88.2",
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1"
+  }
+}
