@@ -309,9 +309,6 @@ module.exports = class RetrievNode {
             }
         })
         app.get('/ipfs/:hash', async function (req, res) {
-            let timeout = setTimeout(function () {
-                res.status(404).send("FILE_NOT_FOUND")
-            }, 30000)
             try {
                 // TODO: Retrieve file from web3.storage / nft.storage and get back to the user.
                 const hash = req.params.hash
