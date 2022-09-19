@@ -357,6 +357,7 @@ const getproposals = async (node) => {
 
 const processdeal = (node, deal_index) => {
     return new Promise(async response => {
+        console.log("Processing deal #" + deal_index.toString())
         try {
             const configs = JSON.parse(fs.readFileSync(node.nodePath + "/configs.json"))
             const { contract, wallet, ethers } = await node.contract()
