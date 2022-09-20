@@ -484,6 +484,9 @@ const processdeal = (node, deal_index) => {
                                     console.log("Pinning with remote service..")
                                     const pinned = await ipfs("post", "/pin/remote/add?arg=" + proposal.deal_uri.replace("ipfs://", "/ipfs/") + '&service=' + configs.pinning_service + '&recursive=true')
                                     console.log('Pinning status is:', pinned)
+                                    if (pinned === false) {
+                                        canAccept = false
+                                    }
                                 } catch (e) {
                                     console.log("Remote pinning failed")
                                     canAccept = false
