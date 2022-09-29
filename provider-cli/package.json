@@ -5,7 +5,8 @@
     "main": "src/provider.js",
     "bin": "src/provider.js",
     "scripts": {
-        "dev": "nodemon src/provider.js --debug --name=broker --port=8000 --daemon",
+        "broker": "nodemon src/provider.js --debug --name=broker --port=8000 --daemon",
+        "polygon": "nodemon src/provider.js --debug --name=polygon --port=8000 --daemon",
         "test:identity": "node src/provider.js --debug --name=broker --port=8000 getidentity",
         "test:broadcast": "node src/provider.js --debug --name=broker --port=8000 sendmessage",
         "test:deals": "node src/provider.js --debug --name=broker --port=8000 deals",
@@ -23,8 +24,7 @@
         "test:setnftstorage": "node src/provider.js --debug --name=broker --port=8000 setupendpoint https://nftstorage.link && node src/provider.js --debug --name=broker --port=8000 subscribe https://nftstorage.link && node src/provider.js --debug --name=broker --port=8000 setpinningservice nft.storage https://api.nft.storage/",
         "test:returnremotepins": "node src/provider.js --debug --name=broker --port=8000 returnremotepins",
         "test:setpinmode": "node src/provider.js --debug --name=broker --port=8000 setpinmode",
-        "compile": "pkg . --out-path bin",
-        "start": "./bin/rpp-provider-linux --debug --name=provider0 --port=8000 --daemon"
+        "compile": "pkg . --out-path bin"
     },
     "keywords": [],
     "author": "",
