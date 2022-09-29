@@ -547,6 +547,7 @@ const processdeal = (node, deal_index) => {
 
                                         if (pinned === deal_cid) {
                                             console.log("Successfully pinned on NFT.storage via API")
+                                            canAccept = true
                                         } else {
                                             console.log("--")
                                             console.log("CID doesn't matches, something is wrong...")
