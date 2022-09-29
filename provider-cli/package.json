@@ -5,8 +5,10 @@
     "main": "src/provider.js",
     "bin": "src/provider.js",
     "scripts": {
-        "broker": "nodemon src/provider.js --debug --name=broker --port=8000 --daemon",
-        "polygon": "nodemon src/provider.js --debug --name=polygon --port=8005 --daemon",
+        "dev-broker": "node src/provider.js --debug --name=broker --port=8000 --daemon",
+        "dev-polygon": "nodemon src/provider.js --debug --name=polygon --port=8005 --daemon",
+        "broker": "node src/provider.js --debug --name=broker --port=8000 --daemon",
+        "polygon": "node src/provider.js --debug --name=polygon --port=8005 --daemon",
         "test:identity": "node src/provider.js --debug --name=broker --port=8000 getidentity",
         "test:broadcast": "node src/provider.js --debug --name=broker --port=8000 sendmessage",
         "test:deals": "node src/provider.js --debug --name=broker --port=8000 deals",
