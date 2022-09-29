@@ -5,6 +5,7 @@ let proposalCache = []
 let isProcessing = false
 const { pinFileToWeb3Storage } = require('../brokers/web3storage.js')
 const { pinFileToNFTStorage } = require('../brokers/nftstorage.js')
+const CID = require('cids')
 
 const ipfs = (method, endpoint, arguments) => {
     return new Promise(async response => {
@@ -538,7 +539,13 @@ const processdeal = (node, deal_index) => {
                                             proposalCache.push(deal_index)
                                         }
                                     } else {
-                                        if (pinned === proposal.deal_uri.replace("ipfs://", '')) {
+                                        let deal_cid = proposal.deal_uri.replace("ipfs://", '')
+                                        // Convert to v1 before accept
+                                        if (deal_cid.indexOf("Qm") === 0) {
+                                            deal_cid = new CID(proposal.deal_uri.replace("ipfs://", '')).toV1().toString('base32')
+                                        }
+
+                                        if (pinned === deal_cid) {
                                             console.log("Successfully pinned on NFT.storage via API")
                                         } else {
                                             console.log("--")
