@@ -7,6 +7,9 @@ const { pinFileToWeb3Storage } = require('../brokers/web3storage.js')
 const { pinFileToNFTStorage } = require('../brokers/nftstorage.js')
 const CID = require('cids')
 
+let slashing_multiplier
+let proposal_timeout
+
 const ipfs = (method, endpoint, arguments) => {
     return new Promise(async response => {
         try {
@@ -235,120 +238,6 @@ const subscribe = async (node) => {
     }
 }
 
-const deals = async (node, ...args) => {
-    if (args[1] !== undefined) {
-        const deal_command = args[1]
-        const { contract, wallet, ethers } = await node.contract()
-        const totalDeals = await contract.totalDeals()
-        const deals = []
-        switch (deal_command) {
-            case "list":
-                console.log("Asking complete list to blockchain..")
-                for (let k = 1; k <= totalDeals; k++) {
-                    const owner = await contract.ownerOf(k);
-                    console.log("Checking if deal #" + k + " was accepted by current provider..")
-                    if (owner === wallet.address) {
-                        deals.push(k)
-                    }
-                }
-                console.log('--')
-                console.log('List of deals is:')
-                console.log(deals)
-                break;
-            case "pending":
-                console.log("Asking complete list to blockchain..")
-                for (let k = 1; k <= totalDeals; k++) {
-                    console.log("Checking if deal #" + k + " allows provider to accept..")
-                    const canAccept = await contract.isProviderInDeal(k, wallet.address)
-                    if (canAccept) {
-                        const owner = await contract.ownerOf(k);
-                        if (owner === '0x0000000000000000000000000000000000000000') {
-                            deals.push(k)
-                        }
-                    }
-                }
-                console.log('--')
-                console.log('List of pending deals is:')
-                console.log(deals)
-                break;
-            case "accept":
-                if (args[2] !== undefined) {
-                    const deal_index = args[2]
-                    const balance = await contract.vault(wallet.address)
-                    console.log("Your internal balance is:", ethers.utils.formatEther(balance.toString()))
-                    const proposal = await contract.deals(deal_index)
-                    const deposit_needed = proposal.value * 100
-                    console.log("Deposit needed is:", ethers.utils.formatEther(deposit_needed.toString()))
-                    let errored = false
-                    if (balance < deposit_needed) {
-                        console.log('Need to deposit, not enough balance inside contract..')
-                        try {
-                            const tx = await contract.depositToVault({ value: deposit_needed })
-                            console.log("Depositing at " + tx.hash)
-                            await tx.wait()
-                        } catch (e) {
-                            console.log('--')
-                            console.log(e.message)
-                            console.log('--')
-                            console.log("Can't deposit, please check error logs.")
-                            errored = true
-                        }
-                    }
-                    if (!errored) {
-                        try {
-                            const tx = await contract.acceptDealProposal(deal_index)
-                            console.log('Pending transaction at: ' + tx.hash)
-                            await tx.wait()
-                            console.log('Deal accepted at ' + tx.hash + '!')
-                        } catch (e) {
-                            console.log('--')
-                            console.log(e.message)
-                            console.log('--')
-                            console.log("Can't accept deal, see error logs.")
-                        }
-                    }
-                } else {
-                    console.log("Please provide DEAL_ID first.")
-                }
-                break;
-            case "process":
-                if (args[2] !== undefined) {
-                    processdeal(node, args[2])
-                } else {
-                    console.log("Please provide DEAL_ID first.")
-                }
-                break;
-            default:
-                console.log("Subcommand not found.")
-                break;
-        }
-    } else {
-        console.log("Please provide deal subcommand, examples:")
-        console.log("`deals list`: returns the list of accepted deals (including inactive)")
-        console.log("`deals pending`: returns the list of pending deals")
-        console.log("`deals accept DEAL_ID`: accept provided deal")
-    }
-}
-
-const withdraw = async (node, ...args) => {
-    const { contract, wallet, ethers } = await node.contract()
-    const balance = await contract.vault(wallet.address)
-    if (balance > 0) {
-        console.log("Starting withdraw of " + ethers.utils.formatEther(balance) + " ETH..")
-        const tx = await contract.withdrawFromVault(balance)
-        console.log('Pending transaction at: ' + tx.hash)
-        await tx.wait()
-    } else {
-        console.log("Nothing to withdraw..")
-    }
-}
-
-const getbalance = async (node) => {
-    const { contract, wallet, ethers } = await node.contract()
-    const balance = await contract.vault(wallet.address)
-    console.log("Balance is " + ethers.utils.formatEther(balance) + " ETH")
-}
-
 const getproposals = async (node) => {
     const { contract, provider } = await node.contract()
     const dealCounter = parseInt((await contract.totalSupply()).toString())
@@ -358,6 +247,20 @@ const getproposals = async (node) => {
         appealsEvents.push({ args: { index: k } })
     }
     return appealsEvents
+}
+
+const loadstate = (node) => {
+    return new Promise(async response => {
+        const { contract } = await node.contract()
+        const configs = JSON.parse(fs.readFileSync(node.nodePath + "/configs.json"))
+        proposal_timeout = await contract.proposal_timeout()
+        if (configs.max_collateral_multiplier !== undefined) {
+            slashing_multiplier = configs.max_collateral_multiplier
+        } else {
+            slashing_multiplier = await contract.slashing_multiplier()
+        }
+        response(true)
+    })
 }
 
 const processdeal = (node, deal_index) => {
@@ -370,7 +273,6 @@ const processdeal = (node, deal_index) => {
             if (canAccept) {
                 const proposal = await contract.deals(deal_index)
                 if (proposal.canceled === false) {
-                    const proposal_timeout = await contract.proposal_timeout()
                     // Check if deal was accepted or expired
                     const expires_at = (parseInt(proposal.timestamp_request.toString()) + parseInt(proposal_timeout.toString())) * 1000
                     const accepted = parseInt(proposal.timestamp_start.toString()) > 0
@@ -401,11 +303,6 @@ const processdeal = (node, deal_index) => {
                                 }
                             } else {
                                 policyMet = true
-                            }
-                            // Check if collateral is acceptable
-                            let slashing_multiplier = await contract.slashing_multiplier()
-                            if (configs.max_collateral_multiplier !== undefined) {
-                                slashing_multiplier = configs.max_collateral_multiplier
                             }
                             const maximum_collateral = parseInt(slashing_multiplier.toString()) * parseInt(proposal.value.toString());
                             if (parseInt(proposal.collateral.toString()) > maximum_collateral) {
@@ -467,22 +364,23 @@ const processdeal = (node, deal_index) => {
                             connectCacheNode(node)
                         }
                         if (policyMet) {
-                            const deposited = await contract.vault(wallet.address)
-                            console.log("Balance before accept is:", ethers.utils.formatEther(deposited.toString()))
-                            const deposit_needed = proposal.value * 100;
-                            console.log("Deposit needed is:", ethers.utils.formatEther(deposit_needed.toString()), "ETH")
-                            if (deposited < deposit_needed) {
-                                try {
-                                    console.log('Need to deposit, not enough balance inside contract..')
-                                    const tx = await contract.depositToVault({ value: deposit_needed.toString() })
-                                    console.log("Depositing at " + tx.hash)
-                                    await tx.wait()
-                                } catch (e) {
-                                    console.log("Can't deposit..")
-                                    canAccept = false
+                            if (proposal.value > 0) {
+                                const deposited = await contract.vault(wallet.address)
+                                console.log("Balance before accept is:", ethers.utils.formatEther(deposited.toString()))
+                                const deposit_needed = proposal.value * 100;
+                                console.log("Deposit needed is:", ethers.utils.formatEther(deposit_needed.toString()), "ETH")
+                                if (deposited < deposit_needed) {
+                                    try {
+                                        console.log('Need to deposit, not enough balance inside contract..')
+                                        const tx = await contract.depositToVault({ value: deposit_needed.toString() })
+                                        console.log("Depositing at " + tx.hash)
+                                        await tx.wait()
+                                    } catch (e) {
+                                        console.log("Can't deposit..")
+                                        canAccept = false
+                                    }
                                 }
                             }
-
                             // Check if pinning mode is active
                             if (configs.pinning_mode !== undefined && configs.pinning_mode === 'REMOTE') {
                                 try {
@@ -579,8 +477,6 @@ const processdeal = (node, deal_index) => {
                                 console.log('Pending transaction at: ' + tx.hash)
                                 await tx.wait()
                                 console.log('Deal accepted at ' + tx.hash + '!')
-                                const balance2 = await contract.vault(wallet.address)
-                                console.log("Balance after accept is:", ethers.utils.formatEther(balance2.toString()))
                                 const message = JSON.stringify({
                                     deal_index: deal_index.toString(),
                                     action: "ACCEPTED",
@@ -671,6 +567,7 @@ const connectCacheNode = async (node) => {
 
 const daemon = async (node) => {
     connectCacheNode(node)
+    await loadstate(node)
     console.log("Running provider daemon..")
     const { contract, wallet, ethers } = await node.contract()
     // Parse proposals
@@ -691,4 +588,4 @@ const daemon = async (node) => {
     })
 }
 
-module.exports = { daemon, getidentity, sendmessage, deals, withdraw, getbalance, subscribe, setupminprice, getstrategy, setupmaxsize, setupmaxduration, setupmaxcollateral, setupendpoint, setpinningservice, storestrategy, returnremotepins, setpinmode }
+module.exports = { daemon, getidentity, sendmessage, subscribe, setupminprice, getstrategy, setupmaxsize, setupmaxduration, setupmaxcollateral, setupendpoint, setpinningservice, storestrategy, returnremotepins, setpinmode }
