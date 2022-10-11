@@ -268,7 +268,7 @@ const processdeal = (node, deal_index) => {
         console.log("Processing deal #" + deal_index.toString())
         try {
             const configs = JSON.parse(fs.readFileSync(node.nodePath + "/configs.json"))
-            const { contract, wallet, ethers } = await node.contract()
+            const { contract, wallet, ethers, provider } = await node.contract()
             let canAccept = await contract.isProviderInDeal(deal_index, wallet.address)
             if (canAccept) {
                 const proposal = await contract.deals(deal_index)
@@ -371,8 +371,9 @@ const processdeal = (node, deal_index) => {
                                 console.log("Deposit needed is:", ethers.utils.formatEther(deposit_needed.toString()), "ETH")
                                 if (deposited < deposit_needed) {
                                     try {
+                                        const gasPrice = await provider.getGasPrice()
                                         console.log('Need to deposit, not enough balance inside contract..')
-                                        const tx = await contract.depositToVault({ value: deposit_needed.toString() })
+                                        const tx = await contract.depositToVault({ value: deposit_needed.toString(), gasPrice })
                                         console.log("Depositing at " + tx.hash)
                                         await tx.wait()
                                     } catch (e) {
@@ -473,7 +474,8 @@ const processdeal = (node, deal_index) => {
                             // Be sure provider can accept deal
                             if (canAccept) {
                                 console.log("Can accept, listed as provider in deal.")
-                                const tx = await contract.acceptDealProposal(deal_index)
+                                const gasPrice = await provider.getGasPrice()
+                                const tx = await contract.acceptDealProposal(deal_index, { gasPrice })
                                 console.log('Pending transaction at: ' + tx.hash)
                                 await tx.wait()
                                 console.log('Deal accepted at ' + tx.hash + '!')
@@ -569,7 +571,7 @@ const daemon = async (node) => {
     connectCacheNode(node)
     await loadstate(node)
     console.log("Running provider daemon..")
-    const { contract, wallet, ethers } = await node.contract()
+    const { contract, wallet, ethers, provider } = await node.contract()
     // Parse proposals
     const proposals = (await getproposals(node)).reverse()
     for (let k in proposals) {
