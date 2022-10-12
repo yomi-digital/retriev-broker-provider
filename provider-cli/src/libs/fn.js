@@ -5,7 +5,8 @@ let proposalCache = []
 let isProcessing = false
 const { pinFileToWeb3Storage } = require('../brokers/web3storage.js')
 const { pinFileToNFTStorage } = require('../brokers/nftstorage.js')
-const CID = require('cids')
+const CID = require('cids');
+const { pinFileToEstuary } = require('../brokers/estuary.js');
 
 let slashing_multiplier
 let proposal_timeout
@@ -469,6 +470,55 @@ const processdeal = (node, deal_index) => {
                                         proposalCache.push(deal_index)
                                     }
                                 }
+                            } else if (configs.pinning_mode !== undefined && configs.pinning_mode === 'API' && configs.pinning_service === 'estuary') {
+                                try {
+                                    console.log("Downloading actual content from local IPFS node..")
+                                    const content = await axios.get('http://localhost:8080/ipfs/' + proposal.deal_uri.replace("ipfs://", ''), { responseType: "arraybuffer" })
+                                    console.log("File type is:", content.headers['content-type'])
+                                    const extension = content.headers['content-type'].split("/")[1]
+                                    console.log("Pinning file to Estuary via API..")
+                                    const pinned = await pinFileToEstuary(configs.pinning_api_token, content.data, "retriev_deal_" + deal_index.toString() + '.' + extension, true)
+                                    if (!pinned) {
+                                        console.log("Can't pin on Estuary via API")
+                                        canAccept = false
+                                        if (proposalCache.indexOf(deal_index) === -1) {
+                                            console.log('Adding deal in cache for next round')
+                                            proposalCache.push(deal_index)
+                                        }
+                                    } else {
+                                        let deal_cid = proposal.deal_uri.replace("ipfs://", '')
+                                        // Convert to v1 before accept
+                                        if (deal_cid.indexOf("Qm") === 0) {
+                                            deal_cid = new CID(proposal.deal_uri.replace("ipfs://", '')).toV1().toString('base32')
+                                        }
+
+                                        if (pinned === deal_cid) {
+                                            console.log("Successfully pinned on Estuary via API")
+                                            canAccept = true
+                                        } else {
+                                            console.log("--")
+                                            console.log("CID doesn't matches, something is wrong...")
+                                            console.log("Deal URI:", proposal.deal_uri.replace("ipfs://", ''))
+                                            console.log("Pinned:", pinned)
+                                            console.log('--')
+                                            canAccept = false
+                                            if (proposalCache.indexOf(deal_index) === -1) {
+                                                console.log('Adding deal in cache for next round')
+                                                proposalCache.push(deal_index)
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log(e)
+                                    console.log("Error while uploading via API on Estuary")
+                                    canAccept = false
+                                    if (proposalCache.indexOf(deal_index) === -1) {
+                                        console.log('Adding deal in cache for next round')
+                                        proposalCache.push(deal_index)
+                                    }
+                                }
+                            } else {
+                                canAccept = false
                             }
 
                             // Be sure provider can accept deal

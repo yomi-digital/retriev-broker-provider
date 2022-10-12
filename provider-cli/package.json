@@ -7,6 +7,7 @@
     "scripts": {
         "dev-broker": "node src/provider.js --debug --name=broker --port=8000 --daemon",
         "dev-polygon": "nodemon src/provider.js --debug --name=polygon --port=8005 --daemon",
+        "dev-estuary": "nodemon src/provider.js --debug --name=estuary --port=8005 --daemon",
         "broker": "node src/provider.js --debug --name=broker --port=8000 --daemon",
         "polygon": "node src/provider.js --debug --name=polygon --port=8005 --daemon",
         "test:identity": "node src/provider.js --debug --name=broker --port=8000 getidentity",
@@ -38,9 +39,13 @@
         "dotenv": "^10.0.0",
         "ethers": "^5.6.2",
         "express": "^4.17.1",
+        "fetch": "^1.1.0",
+        "form-data": "^4.0.0",
         "minimist": "^1.2.6",
         "nft.storage": "^7.0.0",
+        "node-fetch": "^3.2.10",
         "public-ip": "^4.0.4",
+        "stream": "^0.0.2",
         "web3.storage": "^4.3.0"
     },
     "devDependencies": {
