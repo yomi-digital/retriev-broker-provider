@@ -13,8 +13,9 @@ let proposal_timeout
 
 const ipfs = (method, endpoint, arguments) => {
     return new Promise(async response => {
+        let timeout
         try {
-            setTimeout(function () {
+            timeout = setTimeout(function () {
                 console.log('IPFS timed out..')
                 response(false)
             }, 60000)
@@ -26,9 +27,11 @@ const ipfs = (method, endpoint, arguments) => {
                 request.data = arguments
             }
             const res = await axios(request)
+            clearTimeout(timeout)
             response(res.data)
         } catch (e) {
             console.log(e.message)
+            clearTimeout(timeout)
             response(false)
         }
     })
